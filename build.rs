@@ -62,7 +62,7 @@ fn process_template_file(input: &PathBuf, output: &PathBuf) {
     processed = block_re.replace_all(&processed, "{%$1%}").into_owned();
     processed = comment_re.replace_all(&processed, "{#$1#}").into_owned();
 
-    if input.file_name().unwrap().to_str().unwrap() != "base.html" {
+    if input.file_name().unwrap().to_str().unwrap() != "layout.html" {
 
         let start_pieces = processed.split("<body>").collect::<Vec<&str>>();
         processed = start_pieces[1].split("</body>").collect::<Vec<&str>>()[0].to_string();

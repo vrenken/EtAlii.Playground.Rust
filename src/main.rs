@@ -24,6 +24,14 @@ struct InputTemplate<'a> {
 }
 
 #[derive(Template)]
+#[template(path = "home.html")]
+struct HomeTemplate<'a> {
+    title: &'a str,
+    subtitle: &'a str,
+    value: &'a str,
+}
+
+#[derive(Template)]
 #[template(path = "item.html")]
 struct ItemTemplate<'a> {
     item: &'a ListItem,
@@ -46,6 +54,18 @@ async fn show(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();
     Html(
         InputTemplate {
+            title: "Welcome",
+            subtitle: "to our page",
+            value: &name,
+        }
+            .render().unwrap()
+    )
+}
+
+async fn home(State(state): State<AppState>) -> Html<String> {
+    let name = state.name.lock().unwrap().clone();
+    Html(
+        HomeTemplate {
             title: "Welcome",
             subtitle: "to our page",
             value: &name,
@@ -127,7 +147,8 @@ async fn main() {
     };
 
     let app = Router::new()
-        .route("/", get(show))
+        .route("/", get(home))
+        .route("/input", get(show))
         .route("/update-name", post(update_name))
         .route("/items/add", post(add_item))
         .route("/items", get(item_list))
