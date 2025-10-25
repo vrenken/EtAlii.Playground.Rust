@@ -13,17 +13,26 @@ fn main() {
     let raw_dir = Path::new("templates-raw");
     let out_dir = Path::new("templates");
 
-    println!("cargo:rerun-if-changed=templates_raw");
+    // Build triggering
+    println!("cargo:rerun-if-changed=templates-raw");
 
-    fs::create_dir_all(out_dir).unwrap();
+    // Safe creation of folders
+    if !raw_dir.exists() {
+        fs::create_dir_all(raw_dir).expect("Failed to create templates-raw folder");
+        println!("Created missing templates-raw folder");
+    }
+    fs::create_dir_all(out_dir).expect("Failed to create templates folder");
 
+    // Process all templates
+    println!("Processing templates...");
     process_directory(raw_dir, out_dir);
+    println!("Template processing completed.");
 }
 
-/// Recursively process templates_raw → templates
+/// Recursively process templates-raw → templates
 fn process_directory(src: &Path, dst: &Path) {
-    for entry in fs::read_dir(src).unwrap() {
-        let entry = entry.unwrap();
+    for entry in fs::read_dir(src).unwrap_or_else(|_| panic!("Failed to read directory {}", src.display())) {
+        let entry = entry.expect("Failed to read directory entry");
         let path = entry.path();
 
         if path.is_dir() {
@@ -31,7 +40,8 @@ fn process_directory(src: &Path, dst: &Path) {
             fs::create_dir_all(&new_dir).unwrap();
             process_directory(&path, &new_dir);
         } else if path.is_file() {
-            process_template_file(&path, &dst.join(path.file_name().unwrap()));
+            let out_file = dst.join(path.file_name().unwrap());
+            process_template_file(&path, &out_file);
         }
     }
 }
