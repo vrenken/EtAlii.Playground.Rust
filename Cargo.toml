@@ -1,0 +1,12 @@
+[package]
+name = "rust-website-01"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = { version = "0.8.6", features = ["tokio" ]}
+askama = "0.14.0"
+serde = { version = "1.0.228", features = ["derive"] }
+tokio = { version = "1.48.0", features = ["full"] }
+tower-http = { version = "0.6.6", features = ["fs"] }
+hyper = { version = "1.7.0", features = ["server"] }
