@@ -10,25 +10,20 @@
 <!--{% extends "base.html" %}-->
 <!--{% block content %}-->
 
-<div class="columns">
+<div class="columns" id="item-list">
     <!--{% for item in items %}-->
-    <div class="column">
-        <div class="card">
-            <div class="card-content">
-                <h2 class="title">{{ item }}</h2>
-                <h3 class="subtitle">{{ item }}</h3>
-            </div>
-        </div>
-    </div>
+        <!--{% include "item.html" %}-->
     <!--{% endfor %}-->
 </div>
 
-<input id="newItem" type="text" placeholder="Add item" />
+<input type="text" name="name" id="new-name" placeholder="Name" />
+<input type="number" name="quantity" id="new-qty" placeholder="Quantity" value="1" />
 
-<button hx-post="/items/add"
-        hx-include="#newItem"
-        hx-target="#list"
-        hx-swap="outerHTML">
+<button
+    hx-post="/items/add"
+    hx-include="#new-name,#new-qty"
+    hx-target="#item-list"
+    hx-swap="innerHTML">
     Add
 </button>
 
