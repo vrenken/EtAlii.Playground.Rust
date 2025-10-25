@@ -19,12 +19,15 @@ struct AppState {
 #[template(path = "input.html")]
 struct InputTemplate<'a> {
     title: &'a str,
+    subtitle: &'a str,
     value: &'a str,
 }
 
 #[derive(Template)]
 #[template(path = "item_list.html")]
 struct ItemListTemplate<'a> {
+    title: &'a str,
+    subtitle: &'a str,
     items: &'a [String],
 }
 
@@ -36,7 +39,11 @@ struct NameForm {
 async fn show(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();
     Html(
-        InputTemplate { title: "Welcome", value: &name }
+        InputTemplate {
+            title: "Welcome",
+            subtitle: "to our page",
+            value: &name,
+        }
             .render().unwrap()
     )
 }
@@ -57,7 +64,10 @@ struct ItemForm {
 async fn item_list(State(state): State<AppState>) -> Html<String> {
     let items = state.items.lock().unwrap();
     Html(
-        ItemListTemplate { items: &items }
+        ItemListTemplate {
+            title: "Welcome",
+            subtitle: "to our list",
+            items: &items }
             .render().unwrap()
     )
 }
