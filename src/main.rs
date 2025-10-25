@@ -1,3 +1,10 @@
+mod data;
+use data::*;
+mod templates;
+use templates::*;
+mod requests;
+use requests::*;
+
 use askama::Template;
 use axum::{
     routing::{get, post},
@@ -9,92 +16,12 @@ use serde::Deserialize;
 use std::sync::{Arc, Mutex};
 
 
-#[derive(Clone)]
-struct AppState {
-    items: Arc<Mutex<Vec<ListItem>>>,
-    name: Arc<Mutex<String>>,
-}
-
-#[derive(Template)]
-#[template(path = "input.html")]
-struct InputTemplate<'a> {
-    title: &'a str,
-    subtitle: &'a str,
-    value: &'a str,
-}
-
-#[derive(Template)]
-#[template(path = "home.html")]
-struct HomeTemplate<'a> {
-    title: &'a str,
-    subtitle: &'a str,
-    value: &'a str,
-}
-
-#[derive(Template)]
-#[template(path = "item.html")]
-struct ItemTemplate<'a> {
-    item: &'a ListItem,
-}
-
-#[derive(Template)]
-#[template(path = "item_list.html")]
-struct ItemListTemplate<'a> {
-    title: &'a str,
-    subtitle: &'a str,
-    items: &'a [ListItem],
-}
-
-#[derive(Deserialize)]
-struct NameForm {
-    value: String,
-}
-
-async fn show(State(state): State<AppState>) -> Html<String> {
-    let name = state.name.lock().unwrap().clone();
-    Html(
-        InputTemplate {
-            title: "Welcome",
-            subtitle: "to our page",
-            value: &name,
-        }
-            .render().unwrap()
-    )
-}
-
-async fn home(State(state): State<AppState>) -> Html<String> {
-    let name = state.name.lock().unwrap().clone();
-    Html(
-        HomeTemplate {
-            title: "Welcome",
-            subtitle: "to our page",
-            value: &name,
-        }
-            .render().unwrap()
-    )
-}
-
 async fn update_name(
     State(state): State<AppState>,
     Form(form): Form<NameForm>,
 ) -> Html<String> {
     *state.name.lock().unwrap() = form.value.clone();
     Html(form.value)
-}
-
-#[derive(Clone)]
-struct ListItem {
-    name: String,
-    quantity: u32,
-}
-
-impl ListItem {
-    fn new(name: &str, quantity: u32) -> Self {
-        Self {
-            name: name.to_string(),
-            quantity,
-        }
-    }
 }
 
 #[derive(Deserialize)]
@@ -159,5 +86,6 @@ async fn main() {
 
     // run our app with hyper, listening globally on port 3000
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    println!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 }
