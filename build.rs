@@ -10,18 +10,18 @@ const COMMENT_START: &str = r"<!--\{!";
 const COMMENT_END: &str = r"!\}-->";
 
 fn main() {
-    let raw_dir = Path::new("templates-raw");
-    let out_dir = Path::new("templates");
+    let raw_dir = Path::new("templates");
+    let out_dir = Path::new("target//templates");
 
     // Build triggering
     println!("cargo:rerun-if-changed=templates-raw");
 
     // Safe creation of folders
     if !raw_dir.exists() {
-        fs::create_dir_all(raw_dir).expect("Failed to create templates-raw folder");
-        println!("Created missing templates-raw folder");
+        fs::create_dir_all(raw_dir).expect("Failed to create templates folder");
+        println!("Created missing templates folder");
     }
-    fs::create_dir_all(out_dir).expect("Failed to create templates folder");
+    fs::create_dir_all(out_dir).expect("Failed to create target/templates folder");
 
     // Process all templates
     println!("Processing templates...");
