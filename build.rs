@@ -10,7 +10,8 @@ const COMMENT_START: &str = r"<!--\{!";
 const COMMENT_END: &str = r"!\}-->";
 
 fn main() {
-    let raw_dir = Path::new("templates");
+    let raw_dir = Path::new("src//portal");
+    
     let out_dir = Path::new("target//templates");
 
     // Build triggering
@@ -39,7 +40,7 @@ fn process_directory(src: &Path, dst: &Path) {
             let new_dir = dst.join(path.file_name().unwrap());
             fs::create_dir_all(&new_dir).unwrap();
             process_directory(&path, &new_dir);
-        } else if path.is_file() {
+        } else if path.is_file() && path.extension().unwrap() == "html" {
             let out_file = dst.join(path.file_name().unwrap());
             process_template_file(&path, &out_file);
         }

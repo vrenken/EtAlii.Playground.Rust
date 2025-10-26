@@ -2,7 +2,7 @@ use crate::data::*;
 use askama::Template;
 
 #[derive(Template)]
-#[template(path = "input.html")]
+#[template(path = "input//input.html")]
 pub struct InputTemplate<'a> {
     pub title: &'a str,
     pub subtitle: &'a str,
@@ -10,7 +10,7 @@ pub struct InputTemplate<'a> {
 }
 
 #[derive(Template)]
-#[template(path = "home.html")]
+#[template(path = "dashboard//dashboard.html")]
 pub struct HomeTemplate<'a> {
     pub title: &'a str,
     pub subtitle: &'a str,
@@ -18,13 +18,13 @@ pub struct HomeTemplate<'a> {
 }
 
 #[derive(Template)]
-#[template(path = "item.html")]
+#[template(path = "items//item.html")]
 pub struct ItemTemplate<'a> {
     pub item: &'a ListItem,
 }
 
 #[derive(Template)]
-#[template(path = "item_list.html")]
+#[template(path = "items//item_list.html")]
 pub struct ItemListTemplate<'a> {
     pub title: &'a str,
     pub subtitle: &'a str,
