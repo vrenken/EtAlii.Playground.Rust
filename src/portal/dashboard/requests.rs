@@ -7,7 +7,7 @@ use axum::{
     response::Html,
 };
 
-pub async fn home(State(state): State<AppState>) -> Html<String> {
+pub async fn dashboard(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();
     Html(
         HomeTemplate {
