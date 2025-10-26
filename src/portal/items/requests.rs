@@ -4,10 +4,10 @@ use crate::portal::*;
 use askama::Template;
 use axum::{extract::State, response::Html, Form};
 
-pub async fn item_list(State(state): State<AppState>) -> Html<String> {
+pub async fn get_page(State(state): State<AppState>) -> Html<String> {
     let items = state.items.lock().unwrap();
     Html(
-        ItemListTemplate {
+        items::PageTemplate {
             title: "Welcome",
             subtitle: "to our list",
             items: &items }

@@ -7,10 +7,10 @@ use axum::{
     response::Html,
 };
 
-pub async fn dashboard(State(state): State<AppState>) -> Html<String> {
+pub async fn get_page(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();
     Html(
-        HomeTemplate {
+        dashboard::PageTemplate {
             title: "Welcome",
             subtitle: "to our page",
             value: &name,
@@ -22,7 +22,7 @@ pub async fn dashboard(State(state): State<AppState>) -> Html<String> {
 pub async fn cpu(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();
     Html(
-        InputTemplate {
+        dashboard::PageTemplate {
             title: "Welcome",
             subtitle: "to our page",
             value: &name,

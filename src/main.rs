@@ -29,12 +29,12 @@ async fn main() {
     };
 
     let app = Router::new()
-        .route("/", get(dashboard))
-        .route("/input", get(input))
+        .route("/", get(portal::dashboard::get_page))
+        .route("/input", get(portal::input::get_page))
         .route("/dashboard/cpu", get(cpu))
         .route("/update-name", post(update_name))
         .route("/items/add", post(add_item))
-        .route("/items", get(item_list))
+        .route("/items", get(portal::items::get_page))
         .with_state(state)
         .nest_service("/static", axum::routing::get_service(tower_http::services::ServeDir::new("static")))
         .nest_service("/favicon.ico", axum::routing::get_service(tower_http::services::ServeFile::new("favicon.ico")));

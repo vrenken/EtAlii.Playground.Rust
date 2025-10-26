@@ -1,5 +1,4 @@
 ﻿pub(crate) mod dashboard;
-pub(crate) use dashboard::*;
 
 pub(crate) mod items;
 pub(crate) use items::*;

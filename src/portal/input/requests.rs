@@ -4,10 +4,10 @@ use crate::portal::*;
 use askama::Template;
 use axum::{extract::State, response::Html, Form};
 
-pub async fn input(State(state): State<AppState>) -> Html<String> {
+pub async fn get_page(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();
     Html(
-        InputTemplate {
+        input::PageTemplate {
             title: "Welcome",
             subtitle: "to our page",
             value: &name,
