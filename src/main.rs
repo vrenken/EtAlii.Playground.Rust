@@ -1,9 +1,10 @@
 mod data;
 use data::*;
-mod templates;
-use templates::*;
-mod requests;
-use requests::*;
+
+mod portal;
+use portal::dashboard::*;
+use portal::items::*;
+use portal::input::*;
 
 use askama::Template;
 use axum::{
