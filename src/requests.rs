@@ -1,4 +1,5 @@
 ﻿use crate::data::*;
+
 use crate::templates::*;
 
 use askama::Template;
@@ -7,7 +8,7 @@ use axum::{
     response::Html,
 };
 
-pub async fn show(State(state): State<crate::data::AppState>) -> Html<String> {
+pub async fn show(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();
     Html(
         InputTemplate {

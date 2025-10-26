@@ -1,4 +1,4 @@
-use crate::data::ListItem;
+use crate::data::*;
 use askama::Template;
 
 #[derive(Template)]

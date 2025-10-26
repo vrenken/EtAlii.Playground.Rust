@@ -42,7 +42,7 @@ async fn item_list(State(state): State<AppState>) -> Html<String> {
 }
 
 async fn add_item(
-    State(state): State<AppState>,
+    State(state): State<data::AppState>,
     Form(form): Form<ItemForm>) -> Html<String>
 {
 

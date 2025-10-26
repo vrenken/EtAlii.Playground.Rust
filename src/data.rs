@@ -1,31 +1,8 @@
-﻿use std::sync::{Arc, Mutex};
-use serde::Deserialize;
+﻿mod app_state;
+pub use app_state::*;
 
-#[derive(Clone)]
-pub struct AppState {
-    pub items: Arc<Mutex<Vec<ListItem>>>,
-    pub name: Arc<Mutex<String>>,
-}
+mod list_item;
+pub use list_item::*;
 
-
-
-#[derive(Deserialize)]
-pub struct NameForm {
-    pub value: String,
-}
-
-
-#[derive(Clone)]
-pub struct ListItem {
-    pub name: String,
-    pub quantity: u32,
-}
-
-impl ListItem {
-    pub fn new(name: &str, quantity: u32) -> Self {
-        Self {
-            name: name.to_string(),
-            quantity,
-        }
-    }
-}
+mod name_form;
+pub use name_form::*;
