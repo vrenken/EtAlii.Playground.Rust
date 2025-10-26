@@ -18,3 +18,15 @@ pub async fn dashboard(State(state): State<AppState>) -> Html<String> {
             .render().unwrap()
     )
 }
+
+pub async fn cpu(State(state): State<AppState>) -> Html<String> {
+    let name = state.name.lock().unwrap().clone();
+    Html(
+        InputTemplate {
+            title: "Welcome",
+            subtitle: "to our page",
+            value: &name,
+        }
+            .render().unwrap()
+    )
+}

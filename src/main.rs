@@ -31,6 +31,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(dashboard))
         .route("/input", get(input))
+        .route("/dashboard/cpu", get(cpu))
         .route("/update-name", post(update_name))
         .route("/items/add", post(add_item))
         .route("/items", get(item_list))
