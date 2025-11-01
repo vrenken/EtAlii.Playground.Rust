@@ -17,10 +17,34 @@
             <div class="card-content">
                 <h2 class="title">CPU</h2>
                 <h3 class="subtitle">load</h3>
-                <progress class="progress" value="45" max="100">45%</progress>
+                <progress
+                        id="cpu-counter"
+                        hx-get="/dashboard/cpu"
+                        hx-trigger="every 2s"
+                        hx-swap="outerHTML"
+                        class="progress"
+                        value="45"
+                        max="100" />
             </div>
         </div>
     </div>
+    <div class="column">
+        <div class="card">
+            <div class="card-content">
+                <h2 class="title">RAM</h2>
+                <h3 class="subtitle">load</h3>
+                <progress
+                        id="ram-counter"
+                        hx-get="/dashboard/ram"
+                        hx-trigger="every 2s"
+                        hx-swap="outerHTML"
+                        class="progress"
+                        value="45"
+                        max="100" />
+            </div>
+        </div>
+    </div>
+
     <div class="column">
         <div class="card">
             <div class="card-content">
@@ -37,6 +61,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <!--{% endblock %}-->
