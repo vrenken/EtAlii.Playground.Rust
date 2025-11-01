@@ -3,10 +3,15 @@ use data::*;
 
 mod service;
 
+mod configuration;
+use configuration::*;
+
 mod portal;
 use portal::dashboard::*;
 use portal::items::*;
 use portal::input::*;
+
+use config::{Config, File, Environment};
 
 use axum::{
     routing::{get, post},
@@ -16,6 +21,17 @@ use std::sync::{Arc, Mutex};
 
 #[tokio::main]
 async fn main() {
+
+    let config = Config::builder()
+        .add_source(File::with_name("configuration"))
+        // .add_source(File::with_name("configuration.production").required(false))
+        .add_source(File::with_name("configuration.development").required(false))
+        .add_source(Environment::with_prefix("APP").separator("_"))
+        .build()
+        .unwrap();
+
+    let configuration: Configuration = config.try_deserialize().unwrap();
+
     let items = vec![
         ListItem::new("Milk", 2),
         ListItem::new("Bread", 1),
