@@ -53,6 +53,7 @@ async fn main() {
         .route("/items/add", post(add_item))
         .route("/items", get(portal::items::get_page))
         .with_state(state)
+        .with_state(configuration)
         .nest_service("/static", axum::routing::get_service(tower_http::services::ServeDir::new("static")))
         .nest_service("/favicon.ico", axum::routing::get_service(tower_http::services::ServeFile::new("favicon.ico")));
 
