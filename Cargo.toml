@@ -5,10 +5,13 @@ edition = "2024"
 
 [dependencies]
 axum =                                  { version = "0.8.6", features = ["tokio" ]}
+axum-login =                            { version = "0.18.0" }
+
 askama =                                { version = "0.14.0" }
 serde =                                 { version = "1.0.228", features = ["derive"] }
 tokio =                                 { version = "1.48.0", features = ["full"] }
 
+tower-sessions =                        { version = "0.14.0" }
 tower-http =                            { version = "0.6.6", features = ["fs"] }
 sysinfo =                               { version = "0.37.2" }
 config =                                { version = "0.15.18" }
@@ -17,6 +20,10 @@ config =                                { version = "0.15.18" }
 tracing =                               { version = "0.1.41", features = ["log"] }
 tracing-subscriber =                    { version = "0.3.20", features = [ "fmt", "env-filter"] }
 anyhow = "1.0.100"
+
+# Authentication
+axum-sessions =                         { version = "0.6.1" }
+
 
 [build-dependencies]
 regex = "1.12.2"
