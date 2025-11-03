@@ -14,6 +14,9 @@ fn main() {
     
     let out_dir = Path::new("target//templates");
 
+    // trigger recompilation when a new migration is added
+    println!("cargo:rerun-if-changed=migrations");
+
     // Build triggering
     println!("cargo:rerun-if-changed=templates-raw");
 
