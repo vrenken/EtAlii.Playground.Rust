@@ -24,7 +24,7 @@ pub async fn get_cpu() -> Html<String> {
     let cpu_usage = system.global_cpu_usage();
 
     // Print global CPU usage
-    println!("Total CPU Usage: {:.2}%", cpu_usage);
+    tracing::info!("Total CPU Usage: {:.2}%", cpu_usage);
 
     Html(
         dashboard::CpuUsageTemplate
@@ -45,7 +45,7 @@ pub async fn get_ram() -> Html<String> {
     let ram_usage = ram_used / (ram_total / 100);
 
     // Print global RAM usage
-    println!("Total RAM usage: {:.2}%", ram_usage);
+    tracing::info!("Total RAM usage: {:.2}%", ram_usage);
 
     Html(
         dashboard::RamUsageTemplate
