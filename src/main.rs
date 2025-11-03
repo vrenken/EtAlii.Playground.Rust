@@ -1,5 +1,4 @@
-use config::{File, Environment};
-use axum::{ routing::{get, post}, Router };
+use axum::Router;
 use std::sync::{Arc, Mutex};
 use tracing_subscriber::EnvFilter;
 
@@ -12,7 +11,6 @@ mod configuration;
 mod portal;
 
 use portal::*;
-use portal::items::*;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
