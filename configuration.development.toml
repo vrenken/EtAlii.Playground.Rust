@@ -1,2 +1,6 @@
 ﻿[application]
+
+[logging]
 log_level = "info"
+otlp_endpoint = "http://localhost:5341/ingest/otlp/v1/logs"
+seq_api_key = "9tXkTouwgAQNE0yeyk2M"
