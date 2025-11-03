@@ -2,7 +2,18 @@
 use crate::portal::*;
 
 use askama::Template;
-use axum::{extract::State, response::Html, Form};
+use axum::extract::State;
+use axum::response::Html;
+use axum::Form;
+use axum::Router;
+use axum::routing::get;
+use axum::routing::post;
+
+pub fn router() -> Router<AppState> {
+    Router::new()
+        .route("/input", get(get_page))
+        .route("/input/update-name", post(update_name))
+}
 
 pub async fn get_page(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();

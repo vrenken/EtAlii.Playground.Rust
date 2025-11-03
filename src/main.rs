@@ -1,7 +1,6 @@
 use config::{File, Environment};
 use axum::{ routing::{get, post}, Router };
 use std::sync::{Arc, Mutex};
-use tracing::*;
 use tracing_subscriber::EnvFilter;
 
 mod data;
@@ -12,10 +11,8 @@ mod service;
 mod configuration;
 mod portal;
 
-use portal::dashboard::*;
+use portal::*;
 use portal::items::*;
-use portal::input::*;
-
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -31,7 +28,15 @@ async fn main() -> anyhow::Result<()> {
         .with_thread_names(false)
         .init();
 
-    info!("Starting application...");
+    // tracing_subscriber::registry()
+    //     .with(EnvFilter::new(std::env::var("RUST_LOG").unwrap_or_else(
+    //         |_| "axum_login=debug,tower_sessions=debug,sqlx=warn,tower_http=debug".into(),
+    //     )))
+    //     .with(tracing_subscriber::fmt::layer())
+    //     .try_init()?;
+
+
+    tracing::info!("Starting application...");
 
     // === Configuration.
     let configuration = configuration::setup();
@@ -51,14 +56,13 @@ async fn main() -> anyhow::Result<()> {
     };
 
     tracing::info!("Setting up tokio router");
-    let app = Router::new()
-        .route("/", get(portal::dashboard::get_page))
-        .route("/dashboard/cpu", get(get_cpu))
-        .route("/dashboard/ram", get(get_ram))
-        .route("/input", get(portal::input::get_page))
-        .route("/input/update-name", post(update_name))
-        .route("/items/add", post(add_item))
-        .route("/items", get(portal::items::get_page))
+    let mut router = Router::new();
+
+    let app = router
+        .merge(authenticate::router())
+        .merge(dashboard::router())
+        .merge(input::router())
+        .merge(items::router())
         .with_state(state)
         .with_state(configuration)
         .nest_service("/static", axum::routing::get_service(tower_http::services::ServeDir::new("static")))
@@ -69,6 +73,11 @@ async fn main() -> anyhow::Result<()> {
     let listener = tokio::net::TcpListener::bind(endpoint).await?;
     tracing::info!("listening on http://{}", endpoint.replace("0.0.0.0", "127.0.0.1"));
     axum::serve(listener, app).await?;
+
+    // axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
+    //     .serve(app.into_make_service())
+    //     .await
+    //     .unwrap();
 
     Ok(())
 }

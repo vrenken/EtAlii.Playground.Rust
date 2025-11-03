@@ -2,9 +2,19 @@
 use crate::portal::*;
 
 use askama::Template;
-use axum::{ extract::State, response::Html };
+use axum::extract::State;
+use axum::response::Html;
+use axum::routing::get;
+use axum::Router;
 use sysinfo::{ System };
 
+
+pub fn router() -> Router<AppState> {
+    Router::new()
+        .route("/", get(get_page))
+        .route("/dashboard/cpu", get(get_cpu))
+        .route("/dashboard/ram", get(get_ram))
+}
 
 pub async fn get_page(State(state): State<AppState>) -> Html<String> {
     let name = state.name.lock().unwrap().clone();

@@ -2,7 +2,18 @@
 use crate::portal::*;
 
 use askama::Template;
-use axum::{extract::State, response::Html, Form};
+use axum::extract::State;
+use axum::response::Html;
+use axum::Form;
+use axum::Router;
+use axum::routing::get;
+use axum::routing::post;
+
+pub fn router() -> Router<AppState> {
+    Router::new()
+        .route("/items/add", post(add_item))
+        .route("/items", get(get_page))
+}
 
 pub async fn get_page(State(state): State<AppState>) -> Html<String> {
     let items = state.items.lock().unwrap();
