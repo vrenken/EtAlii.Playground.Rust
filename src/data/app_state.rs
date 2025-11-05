@@ -6,4 +6,5 @@ use std::sync::{Arc, Mutex};
 pub struct AppState {
     pub items: Arc<Mutex<Vec<ListItem>>>,
     pub name: Arc<Mutex<String>>,
+    pub is_authenticated: Arc<Mutex<bool>>,
 }
