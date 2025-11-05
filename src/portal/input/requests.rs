@@ -1,4 +1,4 @@
-﻿use crate::data::*;
+﻿use crate::data::AppState;
 use crate::portal::*;
 
 use askama::Template;

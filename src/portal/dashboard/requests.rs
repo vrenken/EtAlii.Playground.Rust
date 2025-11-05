@@ -1,4 +1,4 @@
-﻿use crate::data::*;
+﻿use crate::data::AppState;
 use crate::portal::*;
 
 use askama::Template;
@@ -21,7 +21,7 @@ pub async fn get_page(State(state): State<AppState>) -> Html<String> {
     Html(
         dashboard::PageTemplate {
             title: "Welcome",
-            subtitle: "to our page",
+            subtitle: &*name,
         }.render().unwrap()
     )
 }
