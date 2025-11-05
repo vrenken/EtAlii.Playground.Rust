@@ -16,7 +16,8 @@ use axum_login::tower_sessions::SessionManagerLayer;
 use axum_messages::Messages;
 use axum_messages::MessagesManagerLayer;
 use crate::data::AppState;
-use crate::portal::authentication::templates::{LoginTemplate, ProtectedTemplate};
+use crate::portal::authentication::templates::LoginTemplate;
+//use crate::portal::authentication::templates::ProtectedTemplate;
 use crate::users::Backend;
 use serde::Deserialize;
 use sqlx::SqlitePool;
@@ -74,7 +75,6 @@ pub async fn route_authentication(app_router: Router<AppState>) -> Router<AppSta
 }
 
 mod post {
-    use std::sync::{Arc, Mutex};
     use axum::extract::State;
     use super::*;
     use crate::portal::authentication::users::{AuthSession, Credentials};
@@ -120,25 +120,25 @@ mod get {
     use super::*;
     use crate::portal::authentication::users::AuthSession;
 
-    pub async fn protected(auth_session: AuthSession, State(state): State<AppState>, messages: Messages) -> impl IntoResponse
-    {
-        match auth_session.user
-        {
-            Some(user) => Html(ProtectedTemplate {
-                    title: "Protected",
-                    subtitle: "You are logged in",
-                    messages: messages.into_iter().collect(),
-                    username: &user.username,
-                    is_authenticated: state.is_authenticated.lock().unwrap().clone(),
-                }
-                .render()
-                .unwrap(),
-            )
-            .into_response(),
-
-            None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
-        }
-    }
+    // pub async fn protected(auth_session: AuthSession, State(state): State<AppState>, messages: Messages) -> impl IntoResponse
+    // {
+    //     match auth_session.user
+    //     {
+    //         Some(user) => Html(ProtectedTemplate {
+    //                 title: "Protected",
+    //                 subtitle: "You are logged in",
+    //                 messages: messages.into_iter().collect(),
+    //                 username: &user.username,
+    //                 is_authenticated: state.is_authenticated.lock().unwrap().clone(),
+    //             }
+    //             .render()
+    //             .unwrap(),
+    //         )
+    //         .into_response(),
+    //
+    //         None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
+    //     }
+    // }
 
     pub async fn login(State(state): State<AppState>, messages: Messages, Query(NextUrl { next }): Query<NextUrl>) -> Html<String>
     {
