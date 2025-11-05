@@ -24,7 +24,6 @@ use time::Duration;
 use tokio::task;
 use tower_sessions::cookie::Key;
 use tower_sessions_sqlx_store::SqliteStore;
-use crate::portal::update_name;
 
 // This allows us to extract the "next" field from the query string. We use this
 // to redirect after login.
@@ -65,9 +64,7 @@ pub async fn route_authentication(app_router: Router<AppState>) -> Router<AppSta
     let backend = Backend::new(db);
     let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
-
     app_router
-        //.route("/", get(get::protected))
         .route_layer(login_required!(Backend, login_url = "/login"))
         .route("/login", post(post::login))
         .route("/login", get(get::login))
@@ -122,15 +119,16 @@ mod get {
     {
         match auth_session.user
         {
-            Some(user) => Html(
-                ProtectedTemplate {
+            Some(user) => Html(ProtectedTemplate {
+                    title: "Protected",
+                    subtitle: "You are logged in",
                     messages: messages.into_iter().collect(),
                     username: &user.username,
                 }
-                    .render()
-                    .unwrap(),
+                .render()
+                .unwrap(),
             )
-                .into_response(),
+            .into_response(),
 
             None => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
         }
@@ -138,13 +136,15 @@ mod get {
 
     pub async fn login(messages: Messages, Query(NextUrl { next }): Query<NextUrl>) -> Html<String>
     {
-        Html(LoginTemplate { messages: messages.into_iter().collect(), next }.render().unwrap())
+        Html(LoginTemplate {
+            title: "Login",
+            subtitle: "Please login",
+            messages: messages.into_iter().collect(), next
+        }.render().unwrap())
     }
 
-    pub async fn logout(mut auth_session: AuthSession) -> impl IntoResponse
-    {
-        match auth_session.logout().await
-        {
+    pub async fn logout(mut auth_session: AuthSession) -> impl IntoResponse {
+        match auth_session.logout().await {
             Ok(_) => Redirect::to("/login").into_response(),
             Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
         }
