@@ -1,15 +1,15 @@
 use axum::Router;
 use std::sync::{Arc, Mutex};
+use tokio::signal;
+use tokio::task::AbortHandle;
 use tracing_subscriber::EnvFilter;
 
 mod data;
 use data::*;
 
 mod service;
-
 mod configuration;
 mod portal;
-
 use portal::*;
 
 #[tokio::main]
@@ -54,13 +54,19 @@ async fn main() -> anyhow::Result<()> {
     };
 
     tracing::info!("Setting up tokio router");
-    let mut router = Router::new();
+    let mut app_router = Router::new();
 
-    let app = router
-        .merge(authenticate::router())
-        .merge(dashboard::router())
-        .merge(input::router())
-        .merge(items::router())
+    // Register protected routes.
+    app_router = items::route_private(app_router);
+    app_router = input::route_private(app_router);
+    
+    // Register authentication.
+    app_router = authentication::route_authentication(app_router).await;
+    
+    // Register public routes.
+    app_router = dashboard::route_public(app_router);
+    
+    let app = app_router
         .with_state(state)
         .with_state(configuration)
         .nest_service("/static", axum::routing::get_service(tower_http::services::ServeDir::new("static")))
@@ -78,4 +84,29 @@ async fn main() -> anyhow::Result<()> {
     //     .unwrap();
 
     Ok(())
+}
+
+
+async fn shutdown_signal(deletion_task_abort_handle: AbortHandle) {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => { deletion_task_abort_handle.abort() },
+        _ = terminate => { deletion_task_abort_handle.abort() },
+    }
 }

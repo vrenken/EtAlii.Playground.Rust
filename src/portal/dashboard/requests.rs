@@ -9,8 +9,8 @@ use axum::Router;
 use sysinfo::{ System };
 
 
-pub fn router() -> Router<AppState> {
-    Router::new()
+pub fn route_public(app_router: Router<AppState>) -> Router<AppState> {
+    app_router
         .route("/", get(get_page))
         .route("/dashboard/cpu", get(get_cpu))
         .route("/dashboard/ram", get(get_ram))

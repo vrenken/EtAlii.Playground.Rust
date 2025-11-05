@@ -1,5 +1,4 @@
-﻿pub(crate) mod authenticate;
-mod auth;
-mod users;
+﻿pub(crate) mod users;
 pub mod templates;
-pub mod protected;
+pub(crate) mod requests;
+pub(crate) use requests::*;

@@ -9,8 +9,8 @@ use axum::Router;
 use axum::routing::get;
 use axum::routing::post;
 
-pub fn router() -> Router<AppState> {
-    Router::new()
+pub fn route_private(app_router: Router<AppState>) -> Router<AppState> {
+    app_router
         .route("/input", get(get_page))
         .route("/input/update-name", post(update_name))
 }
