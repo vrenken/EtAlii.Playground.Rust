@@ -1,17 +1,9 @@
 ﻿use axum::{
-    extract::Form,
     response::{Html, Redirect},
-    routing::get,
     Router,
 };
 
-use axum::routing::MethodRouter;
-use axum_sessions::{
-    async_session::MemoryStore,
-    SessionLayer, SessionHandle,
-};
 use crate::data::AppState;
-use crate::portal::dashboard::{get_cpu, get_page, get_ram};
 
 pub fn router() -> Router<AppState> {
 //     let store = MemoryStore::new();
