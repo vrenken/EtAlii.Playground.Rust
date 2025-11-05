@@ -21,8 +21,9 @@ pub async fn get_page(State(state): State<AppState>) -> Html<String> {
         items::PageTemplate {
             title: "Welcome",
             subtitle: "to our list",
-            items: &items }
-            .render().unwrap()
+            items: &items,
+            is_authenticated: state.is_authenticated.lock().unwrap().clone(),
+        }.render().unwrap()
     )
 }
 

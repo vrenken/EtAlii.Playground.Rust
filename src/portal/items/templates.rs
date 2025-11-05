@@ -13,4 +13,5 @@ pub struct PageTemplate<'a> {
     pub title: &'a str,
     pub subtitle: &'a str,
     pub items: &'a [ListItem],
+    pub is_authenticated: bool,
 }

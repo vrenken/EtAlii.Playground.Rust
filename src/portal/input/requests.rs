@@ -22,8 +22,8 @@ pub async fn get_page(State(state): State<AppState>) -> Html<String> {
             title: "Welcome",
             subtitle: "to our page",
             value: &name,
-        }
-            .render().unwrap()
+            is_authenticated: state.is_authenticated.lock().unwrap().clone(),
+        }.render().unwrap()
     )
 }
 

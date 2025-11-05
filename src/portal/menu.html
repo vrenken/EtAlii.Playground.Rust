@@ -57,6 +57,7 @@
     <div id="navbarBasicExample" class="navbar-menu">
         <div class="navbar-start">
             <a class="navbar-item" href="/">Home</a>
+            <!-- {% if is_authenticated %} -->
             <a class="navbar-item" href="/input">Input</a>
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">More</a>
@@ -68,13 +69,18 @@
                     <a class="navbar-item">Report an issue</a>
                 </div>
             </div>
+            <!-- {% endif %} -->
         </div>
 
         <div class="navbar-end">
             <div class="navbar-item">
                 <div class="buttons">
                     <a class="button is-primary"><strong>Sign up</strong></a>
+                    <!-- {% if is_authenticated %} -->
+                    <a class="button is-light" href="/logout">Log out</a>
+                    <!-- {% else %} -->
                     <a class="button is-light" href="/login">Log in</a>
+                    <!-- {% endif %} -->
                 </div>
             </div>
         </div>

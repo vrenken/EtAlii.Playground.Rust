@@ -74,10 +74,12 @@ pub async fn route_authentication(app_router: Router<AppState>) -> Router<AppSta
 }
 
 mod post {
+    use std::sync::{Arc, Mutex};
+    use axum::extract::State;
     use super::*;
     use crate::portal::authentication::users::{AuthSession, Credentials};
 
-    pub async fn login(mut auth_session: AuthSession, messages: Messages, Form(creds): Form<Credentials>) -> impl IntoResponse {
+    pub async fn login(mut auth_session: AuthSession, State(state): State<AppState>, messages: Messages, Form(creds): Form<Credentials>) -> impl IntoResponse {
         let user = match auth_session.authenticate(creds.clone()).await {
             Ok(Some(user)) => user,
             Ok(None) => {
@@ -95,10 +97,12 @@ mod post {
 
         if auth_session.login(&user).await.is_err()
         {
+            *state.is_authenticated.lock().unwrap() = false;
             return StatusCode::INTERNAL_SERVER_ERROR.into_response();
         }
 
         messages.success(format!("Successfully logged in as {}", user.username));
+        *state.is_authenticated.lock().unwrap() = true;
 
         if let Some(ref next) = creds.next
         {
@@ -112,10 +116,11 @@ mod post {
 }
 
 mod get {
+    use axum::extract::State;
     use super::*;
     use crate::portal::authentication::users::AuthSession;
 
-    pub async fn protected(auth_session: AuthSession, messages: Messages) -> impl IntoResponse
+    pub async fn protected(auth_session: AuthSession, State(state): State<AppState>, messages: Messages) -> impl IntoResponse
     {
         match auth_session.user
         {
@@ -124,6 +129,7 @@ mod get {
                     subtitle: "You are logged in",
                     messages: messages.into_iter().collect(),
                     username: &user.username,
+                    is_authenticated: state.is_authenticated.lock().unwrap().clone(),
                 }
                 .render()
                 .unwrap(),
@@ -134,18 +140,21 @@ mod get {
         }
     }
 
-    pub async fn login(messages: Messages, Query(NextUrl { next }): Query<NextUrl>) -> Html<String>
+    pub async fn login(State(state): State<AppState>, messages: Messages, Query(NextUrl { next }): Query<NextUrl>) -> Html<String>
     {
         Html(LoginTemplate {
             title: "Login",
             subtitle: "Please login",
-            messages: messages.into_iter().collect(), next
+            messages: messages.into_iter().collect(),
+            is_authenticated: state.is_authenticated.lock().unwrap().clone(),
+            next
         }.render().unwrap())
     }
 
-    pub async fn logout(mut auth_session: AuthSession) -> impl IntoResponse {
+    pub async fn logout(State(state): State<AppState>, mut auth_session: AuthSession) -> impl IntoResponse {
+        *state.is_authenticated.lock().unwrap() = false;
         match auth_session.logout().await {
-            Ok(_) => Redirect::to("/login").into_response(),
+            Ok(_) => Redirect::to("/").into_response(),
             Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
         }
     }

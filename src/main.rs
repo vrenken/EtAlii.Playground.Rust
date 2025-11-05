@@ -51,6 +51,7 @@ async fn main() -> anyhow::Result<()> {
     let state = AppState {
         items: Arc::new(Mutex::new(items)),
         name: Arc::new(Mutex::new(String::from(""))),
+        is_authenticated: Arc::new(Mutex::new(false))
     };
 
     tracing::info!("Setting up tokio router");

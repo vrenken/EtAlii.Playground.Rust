@@ -8,7 +8,6 @@ use axum::routing::get;
 use axum::Router;
 use sysinfo::{ System };
 
-
 pub fn route_public(app_router: Router<AppState>) -> Router<AppState> {
     app_router
         .route("/", get(get_page))
@@ -22,6 +21,7 @@ pub async fn get_page(State(state): State<AppState>) -> Html<String> {
         dashboard::PageTemplate {
             title: "Welcome",
             subtitle: &*name,
+            is_authenticated: state.is_authenticated.lock().unwrap().clone(),
         }.render().unwrap()
     )
 }

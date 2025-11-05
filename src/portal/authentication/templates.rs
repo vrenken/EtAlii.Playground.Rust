@@ -8,6 +8,7 @@ pub struct LoginTemplate<'a> {
     pub subtitle: &'a str,
     pub messages: Vec<Message>,
     pub next: Option<String>,
+    pub is_authenticated: bool,
 }
 
 
@@ -18,4 +19,5 @@ pub struct ProtectedTemplate<'a> {
     pub subtitle: &'a str,
     pub messages: Vec<Message>,
     pub username: &'a str,
+    pub is_authenticated: bool,
 }
