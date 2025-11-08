@@ -4,6 +4,8 @@ use tokio::signal;
 use tokio::task::AbortHandle;
 use tracing_subscriber::EnvFilter;
 
+mod routing_error;
+
 mod data;
 use data::*;
 
@@ -34,10 +36,11 @@ async fn main() -> anyhow::Result<()> {
     //     .try_init()?;
 
 
-    tracing::info!("Starting application...");
+    tracing::info!("Starting");
 
     // === Configuration.
     let configuration = configuration::setup();
+    tracing::info!("Loading configuration for {}", configuration.application.name);
 
     tracing::info!("Creating app state");
 
@@ -58,16 +61,16 @@ async fn main() -> anyhow::Result<()> {
     let mut app_router = Router::new();
 
     // Register protected routes.
-    app_router = items::route_private(app_router);
-    app_router = input::route_private(app_router);
+    app_router = items::route_private(app_router).await.unwrap();
+    app_router = input::route_private(app_router).await.unwrap();
     
     // Register authentication.
-    app_router = authentication::route_authentication(app_router).await;
+    let auth = authentication::route_authentication(app_router).await.unwrap();
     
     // Register public routes.
-    app_router = dashboard::route_public(app_router);
+    let secured_app_router = dashboard::route_public(auth.secured_app_router).await.unwrap();
     
-    let app = app_router
+    let app = secured_app_router
         .with_state(state)
         .with_state(configuration)
         .nest_service("/static", axum::routing::get_service(tower_http::services::ServeDir::new("static")))
@@ -77,12 +80,9 @@ async fn main() -> anyhow::Result<()> {
     let endpoint = "0.0.0.0:3000";
     let listener = tokio::net::TcpListener::bind(endpoint).await?;
     tracing::info!("listening on http://{}", endpoint.replace("0.0.0.0", "127.0.0.1"));
-    axum::serve(listener, app).await?;
-
-    // axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
-    //     .serve(app.into_make_service())
-    //     .await
-    //     .unwrap();
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal(auth.deletion_task_abort_handle))
+        .await?;
 
     Ok(())
 }

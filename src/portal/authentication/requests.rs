@@ -17,14 +17,16 @@ use axum_messages::Messages;
 use axum_messages::MessagesManagerLayer;
 use crate::data::AppState;
 use crate::portal::authentication::templates::LoginTemplate;
-//use crate::portal::authentication::templates::ProtectedTemplate;
-use crate::users::Backend;
+use crate::portal::authentication::Backend;
 use serde::Deserialize;
 use sqlx::SqlitePool;
 use time::Duration;
 use tokio::task;
+use tokio::task::AbortHandle;
+//use tokio::task::JoinHandle;
 use tower_sessions::cookie::Key;
 use tower_sessions_sqlx_store::SqliteStore;
+use crate::routing_error::RouteError;
 
 // This allows us to extract the "next" field from the query string. We use this
 // to redirect after login.
@@ -33,22 +35,27 @@ pub struct NextUrl {
     next: Option<String>,
 }
 
-pub async fn route_authentication(app_router: Router<AppState>) -> Router<AppState> {
-    let db = SqlitePool::connect(":memory:").await.unwrap();
-    sqlx::migrate!().run(&db).await.unwrap();
+pub struct RouteAuthenticationResult {
+    pub secured_app_router: Router<AppState>,
+    pub deletion_task_abort_handle: AbortHandle
+}
+
+pub async fn route_authentication(app_router: Router<AppState>) -> Result<RouteAuthenticationResult, RouteError> {
+    let db = SqlitePool::connect(":memory:").await.map_err(|_| RouteError)?;
+    sqlx::migrate!().run(&db).await.map_err(|_| RouteError)?;
 
     // Session layer.
     //
     // This uses `tower-sessions` to establish a layer that will provide the session
     // as a request extension.
     let session_store = SqliteStore::new(db.clone());
-    session_store.migrate().await.unwrap();
+    session_store.migrate().await.map_err(|_| RouteError)?;
 
-    let _deletion_task = task::spawn(
+    let deletion_task_abort_handle = task::spawn(
         session_store
             .clone()
             .continuously_delete_expired(tokio::time::Duration::from_secs(60)),
-    );
+    ).abort_handle();
 
     // Generate a cryptographic key to sign the session cookie.
     let key = Key::generate();
@@ -65,13 +72,19 @@ pub async fn route_authentication(app_router: Router<AppState>) -> Router<AppSta
     let backend = Backend::new(db);
     let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
-    app_router
+    let secured_app_router = app_router
         .route_layer(login_required!(Backend, login_url = "/login"))
         .route("/login", post(post::login))
         .route("/login", get(get::login))
         .route("/logout", get(get::logout))
         .layer(MessagesManagerLayer)
-        .layer(auth_layer)
+        .layer(auth_layer);
+
+    let result = crate::portal::authentication::requests::RouteAuthenticationResult {
+        secured_app_router,
+        deletion_task_abort_handle,
+    };
+    return Ok(result);
 }
 
 mod post {

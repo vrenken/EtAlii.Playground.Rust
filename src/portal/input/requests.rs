@@ -1,5 +1,6 @@
 ﻿use crate::data::AppState;
 use crate::portal::*;
+use crate::routing_error::RouteError;
 
 use askama::Template;
 use axum::extract::State;
@@ -9,10 +10,11 @@ use axum::Router;
 use axum::routing::get;
 use axum::routing::post;
 
-pub fn route_private(app_router: Router<AppState>) -> Router<AppState> {
-    app_router
+pub async fn route_private(app_router: Router<AppState>) -> Result<Router<AppState>, RouteError> {
+    let result = app_router
         .route("/input", get(get_page))
-        .route("/input/update-name", post(update_name))
+        .route("/input/update-name", post(update_name));
+    Ok(result)
 }
 
 pub async fn get_page(State(state): State<AppState>) -> Html<String> {
